@@ -1,3 +1,6 @@
+import os
+import time
+
 # Definindo a classe Livro
 class Livro:
     def __init__(self, titulo, autor, quantidade):
@@ -73,6 +76,10 @@ class Emprestimo:
         self._data_devolucao = data_devolucao
         self._estado = 'concluido'
 
+# Função para limpar a tela
+def limpar_tela():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
 # Função principal para o menu inicial
 def menu_inicial():
     print("Bem-vindo ao Sistema de Gestão de Biblioteca")
@@ -103,6 +110,9 @@ def cadastrar_cliente():
     novo_cliente = Membro(nome, cpf)
     clientes.append(novo_cliente)
     print("Cadastro concluído")
+    print("Voltando ao menu principal. Loading...")
+    time.sleep(3)
+    limpar_tela()
 
 # Função para cadastrar livro
 def cadastrar_livro():
@@ -120,6 +130,9 @@ def cadastrar_livro():
     novo_livro = Livro(titulo, autor, quantidade=1)
     livros.append(novo_livro)
     print("Livro cadastrado com sucesso")
+    print("Voltando ao menu principal. Loading...")
+    time.sleep(3)
+    limpar_tela()
 
 # Função para locar livro
 def locar_livro():
@@ -130,6 +143,9 @@ def locar_livro():
         if livro.get_titulo() == titulo:
             if livro.get_quantidade() < 1:
                 print("O livro encontra-se indisponível")
+                print("Voltando ao menu principal. Loading...")
+                time.sleep(3)
+                limpar_tela()
                 return
             else:
                 print(f"Deseja realmente locar {titulo}? Ainda há {livro.get_quantidade()} destes livros. Responda: S ou N")
@@ -137,6 +153,9 @@ def locar_livro():
                 if resposta == 'S':
                     livro.decrementar_quantidade()
                     print("Livro locado com sucesso")
+                    print("Voltando ao menu principal. Loading...")
+                    time.sleep(3)
+                    limpar_tela()
                 return
     
     print("Livro não encontrado")
@@ -178,7 +197,6 @@ def modo_administrador():
     print("Modo Administrador")
     print("1 - Visualizar lista de clientes")
     print("2 - Visualizar lista de livros")
-    print("3 - Histórico de locação")
     print("0 - Voltar ao menu principal")
     
     opcao = input("Escolha uma opção: ")
@@ -187,8 +205,6 @@ def modo_administrador():
         visualizar_lista_clientes()
     elif opcao == '2':
         visualizar_lista_livros()
-    elif opcao == '3':
-        historico_locacao()
 
 # Função para visualizar lista de clientes
 def visualizar_lista_clientes():
@@ -211,12 +227,6 @@ def registrar_emprestimo(livro, membro):
     data_emprestimo = datetime.date.today()
     novo_emprestimo = Emprestimo(livro, membro, data_emprestimo)
     historico_locacoes.append(novo_emprestimo)
-
-# Função para visualizar histórico de locações
-def historico_locacao():
-    print("Histórico de Locações:")
-    for emprestimo in historico_locacoes:
-        print(f"Livro: {emprestimo.get_livro().get_titulo()}, Membro: {emprestimo.get_membro().get_nome()}, Data de Empréstimo: {emprestimo.get_data_emprestimo()}, Estado: {emprestimo.get_estado()}")
 
 # Função principal
 def main():
