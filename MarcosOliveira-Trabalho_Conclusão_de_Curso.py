@@ -1,217 +1,246 @@
-from datetime import datetime
-
+# Definindo a classe Livro
 class Livro:
-    def __init__(self, titulo, autor):
+    def __init__(self, titulo, autor, quantidade):
         self._titulo = titulo
         self._autor = autor
-        self._status = 'disponível'
+        self._quantidade = quantidade
 
-    @property
-    def titulo(self):
+    # Getters e Setters
+    def get_titulo(self):
         return self._titulo
 
-    @property
-    def autor(self):
+    def get_autor(self):
         return self._autor
 
-    @property
-    def status(self):
-        return self._status
+    def get_quantidade(self):
+        return self._quantidade
 
-    def emprestar(self):
-        if self._status == 'disponível':
-            self._status = 'emprestado'
-        else:
-            print("Livro já está emprestado.")
+    def set_quantidade(self, quantidade):
+        self._quantidade = quantidade
 
-    def devolver(self):
-        if self._status == 'emprestado':
-            self._status = 'disponível'
-        else:
-            print("Livro já está disponível.")
+    def incrementar_quantidade(self, quantidade=1):
+        self._quantidade += quantidade
 
-    def __str__(self):
-        return f"Título: {self._titulo}, Autor: {self._autor}, Status: {self._status}"
+    def decrementar_quantidade(self, quantidade=1):
+        self._quantidade -= quantidade
 
+# Definindo a classe Membro
 class Membro:
-    def __init__(self, nome, id_membro, endereco):
+    def __init__(self, nome, cpf, status='Ativo'):
         self._nome = nome
-        self._id_membro = id_membro
-        self._endereco = endereco
+        self._cpf = cpf
+        self._status = status
 
-    @property
-    def nome(self):
+    # Getters e Setters
+    def get_nome(self):
         return self._nome
 
-    @property
-    def id_membro(self):
-        return self._id_membro
+    def get_cpf(self):
+        return self._cpf
 
-    @property
-    def endereco(self):
-        return self._endereco
+    def get_status(self):
+        return self._status
 
-    def __str__(self):
-        return f"Nome: {self._nome}, ID: {self._id_membro}, Endereço: {self._endereco}"
+    def set_status(self, status):
+        self._status = status
 
+# Definindo a classe Emprestimo
 class Emprestimo:
-    def __init__(self, livro, membro):
+    def __init__(self, livro, membro, data_emprestimo, data_devolucao=None):
         self._livro = livro
         self._membro = membro
-        self._data_emprestimo = datetime.now()
-        self._data_devolucao = None
-        self._estado = 'ativo'
-        livro.emprestar()
+        self._data_emprestimo = data_emprestimo
+        self._data_devolucao = data_devolucao
+        self._estado = 'ativo' if data_devolucao is None else 'concluido'
 
-    @property
-    def livro(self):
+    # Getters e Setters
+    def get_livro(self):
         return self._livro
 
-    @property
-    def membro(self):
+    def get_membro(self):
         return self._membro
 
-    @property
-    def data_emprestimo(self):
+    def get_data_emprestimo(self):
         return self._data_emprestimo
 
-    @property
-    def data_devolucao(self):
+    def get_data_devolucao(self):
         return self._data_devolucao
 
-    @property
-    def estado(self):
+    def get_estado(self):
         return self._estado
 
-    def devolver(self):
-        if self._estado == 'ativo':
-            self._data_devolucao = datetime.now()
-            self._estado = 'concluído'
-            self._livro.devolver()
-        else:
-            print("Empréstimo já foi concluído.")
+    def set_data_devolucao(self, data_devolucao):
+        self._data_devolucao = data_devolucao
+        self._estado = 'concluido'
 
-    def __str__(self):
-        return f"Livro: {self._livro.titulo}, Membro: {self._membro.nome}, Data de Empréstimo: {self._data_emprestimo}, Estado: {self._estado}"
+# Função principal para o menu inicial
+def menu_inicial():
+    print("Bem-vindo ao Sistema de Gestão de Biblioteca")
+    print("1 - Cadastrar Cliente")
+    print("2 - Cadastrar Livro")
+    print("3 - Locar livro")
+    print("4 - Remover cliente")
+    print("5 - Remover livro")
+    print("6 - Modo administrador")
+    print("0 - Sair")
 
-class Biblioteca:
-    def __init__(self):
-        self._livros = []  # Lista de livros
-        self._membros = []  # Lista de membros
-        self._emprestimos = []  # Lista de empréstimos
-        self._clientes = []  # Matriz de clientes
-        self._catalogo_livros = []  # Matriz de catálogo de livros
+# Matrizes de clientes e livros
+clientes = []
+livros = []
 
-    def adicionar_livro(self, titulo):
-        # Verifica se o livro já está no catálogo
-        for livro in self._catalogo_livros:
-            if livro[0] == titulo:
-                livro[1] += 1  # Aumenta a quantidade do livro
-                print(f"Quantidade de '{titulo}' atualizada para {livro[1]}.")
+# Função para cadastrar cliente
+def cadastrar_cliente():
+    nome = input("Digite o nome do cliente: ")
+    cpf = input("Digite o CPF do cliente: ")
+    
+    # Verificando se o CPF já está cadastrado e ativo
+    for cliente in clientes:
+        if cliente.get_cpf() == cpf and cliente.get_status() == 'Ativo':
+            print("CPF já cadastrado e cliente está ativo")
+            return
+    
+    # Adicionando novo cliente
+    novo_cliente = Membro(nome, cpf)
+    clientes.append(novo_cliente)
+    print("Cadastro concluído")
+
+# Função para cadastrar livro
+def cadastrar_livro():
+    titulo = input("Digite o título do livro: ")
+    
+    # Verificando se o livro já está cadastrado
+    for livro in livros:
+        if livro.get_titulo() == titulo:
+            livro.incrementar_quantidade()
+            print("Livro já cadastrado, quantidade incrementada")
+            return
+    
+    # Adicionando novo livro
+    autor = input("Digite o autor do livro: ")
+    novo_livro = Livro(titulo, autor, quantidade=1)
+    livros.append(novo_livro)
+    print("Livro cadastrado com sucesso")
+
+# Função para locar livro
+def locar_livro():
+    titulo = input("Digite o título do livro que deseja locar: ")
+    
+    # Buscando o livro
+    for livro in livros:
+        if livro.get_titulo() == titulo:
+            if livro.get_quantidade() < 1:
+                print("O livro encontra-se indisponível")
                 return
-        # Adiciona novo livro ao catálogo
-        self._catalogo_livros.append([titulo, 1])
-        print(f"Livro '{titulo}' adicionado ao catálogo.")
-
-    def remover_livro(self, titulo):
-        # Remove livro da lista de livros
-        self._livros = [livro for livro in self._livros if livro.titulo != titulo]
-        # Remove livro do catálogo
-        self._catalogo_livros = [livro for livro in self._catalogo_livros if livro[0] != titulo]
-        print(f"Livro '{titulo}' removido do catálogo.")
-
-    def registrar_membro(self, nome, cpf, endereco):
-        # Verifica se o cliente já está cadastrado
-        for cliente in self._clientes:
-            if cliente[1] == cpf and cliente[2] == 'Ativo':
-                print("CPF já cadastrado e cliente está ativo.")
-                return
-        # Adiciona novo cliente à matriz de clientes
-        self._clientes.append([nome, cpf, 'Ativo'])
-        print("Cadastro concluído.")
-
-    def remover_membro(self, cpf):
-        # Marca cliente como 'Desativo' na matriz de clientes
-        for cliente in self._clientes:
-            if cliente[1] == cpf:
-                cliente[2] = 'Desativo'
-                print(f"Cliente com CPF {cpf} removido (marcado como 'Desativo').")
-                return
-        print("Cliente não encontrado.")
-
-    def registrar_emprestimo(self, titulo_livro, id_membro):
-        livro = next((livro for livro in self._livros if livro.titulo == titulo_livro and livro.status == 'disponível'), None)
-        membro = next((membro for membro in self._membros if membro.id_membro == id_membro), None)
-        if livro and membro:
-            emprestimo = Emprestimo(livro, membro)
-            self._emprestimos.append(emprestimo)
-        else:
-            print("Livro não disponível ou Membro não encontrado.")
-
-    def registrar_devolucao(self, titulo_livro, id_membro):
-        emprestimo = next((emp for emp in self._emprestimos if emp.livro.titulo == titulo_livro and emp.membro.id_membro == id_membro and emp.estado == 'ativo'), None)
-        if emprestimo:
-            emprestimo.devolver()
-        else:
-            print("Empréstimo não encontrado ou já concluído.")
-
-    def listar_livros_disponiveis(self):
-        return [livro for livro in self._livros if livro.status == 'disponível']
-
-    def listar_livros_emprestados(self):
-        return [livro for livro in self._livros if livro.status == 'emprestado']
-
-    def locar_livro(self, titulo_livro):
-        # Encontra o livro no catálogo
-        for livro in self._catalogo_livros:
-            if livro[0] == titulo_livro:
-                if livro[1] < 1:
-                    print("O livro encontra-se indisponível")
-                else:
-                    resposta = input(f"Deseja realmente locar '{titulo_livro}'? Ainda há {livro[1]} destes livros. Responda: S ou N: ")
-                    if resposta.upper() == 'S':
-                        livro[1] -= 1
-                        print("Livro locado com sucesso.")
-                    else:
-                        print("Operação cancelada. Voltando para o menu principal.")
-                return
-        print("Livro não encontrado")
-
-    def menu(self):
-        while True:
-            print("\nMenu Principal:")
-            print("1 - Cadastrar Cliente")
-            print("2 - Cadastrar Livro")
-            print("3 - Locar Livro")
-            print("4 - Remover Cliente")
-            print("5 - Remover Livro")
-            print("0 - Sair")
-            opcao = input("Escolha uma opção: ")
-
-            if opcao == '1':
-                nome = input("Digite o nome do cliente: ")
-                cpf = input("Digite o CPF do cliente: ")
-                endereco = input("Digite o endereço do cliente: ")
-                self.registrar_membro(nome, cpf, endereco)
-            elif opcao == '2':
-                titulo = input("Digite o título do livro: ")
-                self.adicionar_livro(titulo)
-            elif opcao == '3':
-                titulo_livro = input("Digite o título do livro a ser locado: ")
-                self.locar_livro(titulo_livro)
-            elif opcao == '4':
-                cpf = input("Digite o CPF do cliente a ser removido: ")
-                self.remover_membro(cpf)
-            elif opcao == '5':
-                titulo = input("Digite o título do livro a ser removido: ")
-                self.remover_livro(titulo)
-            elif opcao == '0':
-                print("Saindo do sistema.")
-                break
             else:
-                print("Opção inválida. Tente novamente.")
+                print(f"Deseja realmente locar {titulo}? Ainda há {livro.get_quantidade()} destes livros. Responda: S ou N")
+                resposta = input().upper()
+                if resposta == 'S':
+                    livro.decrementar_quantidade()
+                    print("Livro locado com sucesso")
+                return
+    
+    print("Livro não encontrado")
 
-# Exemplo de uso
+# Função para remover cliente
+def remover_cliente():
+    cpf = input("Digite o CPF do cliente que deve ser excluído: ")
+    
+    # Verificando se o CPF está cadastrado
+    for cliente in clientes:
+        if cliente.get_cpf() == cpf:
+            print(f"Deseja excluir {cliente.get_nome()} portador do cpf: {cpf}? S/N")
+            resposta = input().upper()
+            if resposta == 'S':
+                clientes.remove(cliente)
+                print("Cliente removido com sucesso")
+            return
+    
+    print("CPF não encontrado")
+
+# Função para remover livro
+def remover_livro():
+    titulo = input("Digite o nome do livro que deseja remover: ")
+    
+    # Verificando se o livro está cadastrado
+    for livro in livros:
+        if livro.get_titulo() == titulo:
+            print(f"Deseja realmente excluir o livro {titulo} do seu acervo? S/N")
+            resposta = input().upper()
+            if resposta == 'S':
+                livros.remove(livro)
+                print("Livro removido com sucesso")
+            return
+    
+    print("Livro não encontrado")
+
+# Função do modo administrador
+def modo_administrador():
+    print("Modo Administrador")
+    print("1 - Visualizar lista de clientes")
+    print("2 - Visualizar lista de livros")
+    print("3 - Histórico de locação")
+    print("0 - Voltar ao menu principal")
+    
+    opcao = input("Escolha uma opção: ")
+    
+    if opcao == '1':
+        visualizar_lista_clientes()
+    elif opcao == '2':
+        visualizar_lista_livros()
+    elif opcao == '3':
+        historico_locacao()
+
+# Função para visualizar lista de clientes
+def visualizar_lista_clientes():
+    print("Lista de Clientes:")
+    for cliente in clientes:
+        print(f"Nome: {cliente.get_nome()}, CPF: {cliente.get_cpf()}, Status: {cliente.get_status()}")
+
+# Função para visualizar lista de livros
+def visualizar_lista_livros():
+    print("Lista de Livros:")
+    for livro in livros:
+        print(f"Título: {livro.get_titulo()}, Autor: {livro.get_autor()}, Quantidade: {livro.get_quantidade()}")
+
+# Histórico de locações (para simplificar, vamos manter uma lista global)
+historico_locacoes = []
+
+# Função para registrar empréstimo
+def registrar_emprestimo(livro, membro):
+    import datetime
+    data_emprestimo = datetime.date.today()
+    novo_emprestimo = Emprestimo(livro, membro, data_emprestimo)
+    historico_locacoes.append(novo_emprestimo)
+
+# Função para visualizar histórico de locações
+def historico_locacao():
+    print("Histórico de Locações:")
+    for emprestimo in historico_locacoes:
+        print(f"Livro: {emprestimo.get_livro().get_titulo()}, Membro: {emprestimo.get_membro().get_nome()}, Data de Empréstimo: {emprestimo.get_data_emprestimo()}, Estado: {emprestimo.get_estado()}")
+
+# Função principal
+def main():
+    while True:
+        menu_inicial()
+        opcao = input("Escolha uma opção: ")
+        
+        if opcao == '1':
+            cadastrar_cliente()
+        elif opcao == '2':
+            cadastrar_livro()
+        elif opcao == '3':
+            locar_livro()
+        elif opcao == '4':
+            remover_cliente()
+        elif opcao == '5':
+            remover_livro()
+        elif opcao == '6':
+            modo_administrador()
+        elif opcao == '0':
+            print("Saindo do sistema...")
+            break
+        else:
+            print("Opção inválida. Tente novamente.")
+
 if __name__ == "__main__":
-    biblioteca = Biblioteca()
-    biblioteca.menu()
+    main()
